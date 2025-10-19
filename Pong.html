@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game - Play Free Online | Sakaz PlayZone</title>
+    <meta name="description" content="Play free Pong game online. Classic arcade game where you control a paddle to hit the ball. Play against the AI opponent.">
+    <meta name="keywords" content="pong game, classic game, arcade game, paddle game, ball game">
+    <meta property="og:title" content="Pong - Free Classic Arcade Game">
+    <meta property="og:description" content="Play Pong online against AI. Hit the ball and score points!">
+    <link rel="canonical" href="https://saka0701.github.io/Sakaz-gaming-/pong.html">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        h1 { color: #667eea; margin-bottom: 20px; }
+        .score-display { font-size: 1.5rem; font-weight: bold; color: #333; margin: 15px 0; }
+        canvas { border: 3px solid #667eea; border-radius: 10px; background: #000; display: block; margin: 20px auto; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 30px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 10px; font-weight: bold; }
+        button:hover { opacity: 0.8; }
+        .instructions { background: #f0f4ff; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: left; }
+        .instructions h3 { color: #667eea; margin-bottom: 10px; }
+        .back { margin-top: 20px; }
+        .back a { color: #667eea; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏓 Pong</h1>
+        <div class="score-display">
+            You: <span id="playerScore">0</span> | AI: <span id="aiScore">0</span>
+        </div>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <button onclick="startGame()">🎮 Start Game</button>
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <p>✓ Move your mouse up/down to control left paddle</p>
+            <p>✓ Hit the ball to score</p>
+            <p>✓ First to 5 wins!</p>
+        </div>
+        <div class="back">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let playerScore = 0;
+        let aiScore = 0;
+        let gameRunning = false;
+        
+        let paddle = {x: 10, y: 175, w: 10, h: 50, speed: 5};
+        let ai = {x: 580, y: 175, w: 10, h: 50};
+        let ball = {x: 300, y: 200, r: 7, vx: 4, vy: 4};
+        
+        function startGame() {
+            playerScore = 0;
+            aiScore = 0;
+            gameRunning = true;
+            document.getElementById('playerScore').textContent = 0;
+            document.getElementById('aiScore').textContent = 0;
+            ball = {x: 300, y: 200, r: 7, vx: 4, vy: 4};
+            gameLoop();
+        }
+        
+        function gameLoop() {
+            if(!gameRunning) return;
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function update() {
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            
+            if(ball.y - ball.r < 0 || ball.y + ball.r > canvas.height) {
+                ball.vy *= -1;
+            }
+            
+            if(ball.x - ball.r < paddle.x + paddle.w && 
+               ball.y > paddle.y && 
+               ball.y < paddle.y + paddle.h) {
+                ball.vx = Math.abs(ball.vx) * 1.05;
+                ball.x = paddle.x + paddle.w + ball.r;
+            }
+            
+            if(ball.x + ball.r > ai.x && 
+               ball.y > ai.y && 
+               ball.y < ai.y + ai.h) {
+                ball.vx = -Math.abs(ball.vx) * 1.05;
+                ball.x = ai.x - ball.r;
+            }
+            
+            if(ball.x - ball.r < 0) {
+                aiScore++;
+                document.getElementById('aiScore').textContent = aiScore;
+                if(aiScore >= 5) {
+                    gameRunning = false;
+                    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'white';
+                    ctx.font = '30px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('AI Wins!', 300, 200);
+                    return;
+                }
+                ball = {x: 300, y: 200, r: 7, vx: 4, vy: 4};
+            }
+            
+            if(ball.x + ball.r > canvas.width) {
+                playerScore++;
+                document.getElementById('playerScore').textContent = playerScore;
+                if(playerScore >= 5) {
+                    gameRunning = false;
+                    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'white';
+                    ctx.font = '30px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('You Win!', 300, 200);
+                    return;
+                }
+                ball = {x: 300, y: 200, r: 7, vx: -4, vy: 4};
+            }
+            
+            if(ball.y < ai.y + ai.h / 2) {
+                ai.y -= 4;
+            } else {
+                ai.y += 4;
+            }
+            
+            ai.y = Math.max(0, Math.min(ai.y, canvas.height - ai.h));
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#FFF';
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = '#FFF';
+            ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
+            ctx.fillRect(ai.x, ai.y, ai.w, ai.h);
+            
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        document.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            paddle.y = e.clientY - rect.top - paddle.h / 2;
+            paddle.y = Math.max(0, Math.min(paddle.y, canvas.height - paddle.h));
+        });
+    </script>
+</body>
+</html>
