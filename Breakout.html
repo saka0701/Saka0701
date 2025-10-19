@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakout Game - Play Free Online | Sakaz PlayZone</title>
+    <meta name="description" content="Play free Breakout game online. Break bricks, avoid losing the ball, and clear all levels. Classic arcade brick breaker game.">
+    <meta name="keywords" content="breakout game, brick breaker, arcade game, ball game, brick smash">
+    <meta property="og:title" content="Breakout - Free Brick Breaker Game">
+    <meta property="og:description" content="Play Breakout and break all the bricks!">
+    <link rel="canonical" href="https://saka0701.github.io/Sakaz-gaming-/breakout.html">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        h1 { color: #667eea; margin-bottom: 20px; }
+        canvas { border: 3px solid #667eea; border-radius: 10px; background: #000; display: block; margin: 20px auto; }
+        .score-display { font-size: 1.3rem; font-weight: bold; color: #333; margin: 10px 0; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 30px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 10px; font-weight: bold; }
+        button:hover { opacity: 0.8; }
+        .instructions { background: #f0f4ff; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: left; }
+        .instructions h3 { color: #667eea; margin-bottom: 10px; }
+        .back { margin-top: 20px; }
+        .back a { color: #667eea; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧱 Breakout</h1>
+        <canvas id="gameCanvas" width="400" height="500"></canvas>
+        <div class="score-display">Score: <span id="score">0</span></div>
+        <button onclick="startGame()">🎮 Start Game</button>
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <p>✓ Move mouse left/right to control paddle</p>
+            <p>✓ Break all bricks before ball falls</p>
+            <p>✓ Each brick destroyed = 10 points</p>
+        </div>
+        <div class="back">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let paddle = {x: 175, w: 50, h: 10, y: 480};
+        let ball = {x: 200, y: 400, r: 5, vx: 3, vy: -3};
+        let bricks = [];
+        let score = 0;
+        let gameRunning = false;
+        
+        function initBricks() {
+            bricks = [];
+            for(let row = 0; row < 3; row++) {
+                for(let col = 0; col < 8; col++) {
+                    bricks.push({x: col * 50, y: row * 20, w: 48, h: 18, active: true});
+                }
+            }
+        }
+        
+        function startGame() {
+            initBricks();
+            ball = {x: 200, y: 400, r: 5, vx: 3, vy: -3};
+            score = 0;
+            gameRunning = true;
+            document.getElementById('score').textContent = 0;
+            gameLoop();
+        }
+        
+        function gameLoop() {
+            if(!gameRunning) return;
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function update() {
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            
+            if(ball.x - ball.r < 0 || ball.x + ball.r > canvas.width) ball.vx *= -1;
+            if(ball.y - ball.r < 0) ball.vy *= -1;
+            
+            if(ball.y + ball.r > canvas.height) {
+                gameRunning = false;
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Game Over!', 200, 250);
+                return;
+            }
+            
+            if(ball.y + ball.r > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.w) {
+                ball.vy *= -1;
+            }
+            
+            bricks.forEach(brick => {
+                if(!brick.active) return;
+                if(ball.x > brick.x && ball.x < brick.x + brick.w && ball.y > brick.y && ball.y < brick.y + brick.h) {
+                    brick.active = false;
+                    ball.vy *= -1;
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                }
+            });
+            
+            if(bricks.every(b => !b.active)) {
+                gameRunning = false;
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('You Won!', 200, 250);
+            }
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
+            
+            ctx.fillStyle = '#FF6B6B';
+            bricks.forEach(brick => {
+                if(brick.active) {
+                    ctx.fillRect(brick.x, brick.y, brick.w, brick.h);
+                }
+            });
+        }
+        
+        document.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            paddle.x = e.clientX - rect.left - paddle.w / 2;
+            paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.w));
+        });
+    </script>
+</body>
+</html>
