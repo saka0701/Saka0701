@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match Game - Play Free Online | Sakaz PlayZone</title>
+    <meta name="description" content="Play free Memory Match game online. Flip cards and find matching pairs. Improve your memory skills with fun gameplay.">
+    <meta name="keywords" content="memory game, matching game, memory match, brain game, card game, concentration game">
+    <meta property="og:title" content="Memory Match - Free Online Card Game">
+    <meta property="og:description" content="Test your memory with Memory Match. Flip cards and find all matching pairs!">
+    <link rel="canonical" href="https://saka0701.github.io/Sakaz-gaming-/memory-match.html">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-width: 500px; }
+        h1 { color: #667eea; margin-bottom: 20px; }
+        .stats { display: flex; justify-content: space-around; margin: 20px 0; }
+        .stat { padding: 10px 20px; background: #f0f4ff; border-radius: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 30px 0; }
+        .card { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 10px; font-size: 2rem; cursor: pointer; transition: all 0.2s; color: white; font-weight: bold; }
+        .card:hover { transform: scale(1.05); }
+        .card.flipped { background: linear-gradient(135deg, #f0f4ff, #e0e7ff); color: #333; }
+        .card.matched { opacity: 0.5; cursor: default; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 30px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 10px; font-weight: bold; transition: opacity 0.3s; }
+        button:hover { opacity: 0.8; }
+        .back { margin-top: 20px; }
+        .back a { color: #667eea; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Memory Match</h1>
+        <div class="stats">
+            <div class="stat">Moves: <span id="moves">0</span></div>
+            <div class="stat">Matched: <span id="matched">0/8</span></div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <button onclick="newGame()">🎮 New Game</button>
+        <div class="back">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+    <script>
+        const emojis = ['🍎', '🍌', '🍒', '🍊', '🍉', '🍇', '🍓', '🥝'];
+        let cards = [];
+        let flipped = [];
+        let matched = 0;
+        let moves = 0;
+        
+        function initGame() {
+            let gameCards = [...emojis, ...emojis];
+            gameCards.sort(() => Math.random() - 0.5);
+            cards = gameCards;
+            matched = 0;
+            moves = 0;
+            flipped = [];
+            document.getElementById('moves').textContent = 0;
+            document.getElementById('matched').textContent = '0/8';
+            
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            cards.forEach((emoji, i) => {
+                const card = document.createElement('button');
+                card.className = 'card';
+                card.textContent = '?';
+                card.onclick = () => flipCard(i, card);
+                grid.appendChild(card);
+            });
+        }
+        
+        function flipCard(index, element) {
+            if(flipped.length >= 2 || flipped.includes(index) || element.classList.contains('matched')) return;
+            
+            element.textContent = cards[index];
+            element.classList.add('flipped');
+            flipped.push(index);
+            
+            if(flipped.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                
+                if(cards[flipped[0]] === cards[flipped[1]]) {
+                    document.querySelectorAll('.card')[flipped[0]].classList.add('matched');
+                    document.querySelectorAll('.card')[flipped[1]].classList.add('matched');
+                    matched++;
+                    document.getElementById('matched').textContent = matched + '/8';
+                    flipped = [];
+                    
+                    if(matched === 8) {
+                        setTimeout(() => alert('🎉 You won in ' + moves + ' moves!'), 300);
+                    }
+                } else {
+                    setTimeout(() => {
+                        document.querySelectorAll('.card')[flipped[0]].textContent = '?';
+                        document.querySelectorAll('.card')[flipped[0]].classList.remove('flipped');
+                        document.querySelectorAll('.card')[flipped[1]].textContent = '?';
+                        document.querySelectorAll('.card')[flipped[1]].classList.remove('flipped');
+                        flipped = [];
+                    }, 800);
+                }
+            }
+        }
+        
+        function newGame() {
+            initGame();
+        }
+        
+        initGame();
+    </script>
+</body>
+</html>
