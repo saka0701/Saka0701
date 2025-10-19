@@ -1,6 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe Game - Play AI Online | Sakaz PlayZone</title>
+    <meta name="description" content="Play free Tic Tac Toe online against AI. Try to get three in a row and beat the computer. Fun strategy game for all ages.">
+    <meta name="keywords" content="tic tac toe, tictactoe, noughts and crosses, strategy game, ai game, online game">
+    <meta property="og:title" content="Tic Tac Toe - Play Against AI">
+    <meta property="og:description" content="Challenge the AI in Tic Tac Toe. Get three in a row to win!">
+    <link rel="canonical" href="https://saka0701.github.io/Sakaz-gaming-/tic-tac-toe.html">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 450px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        h1 { color: #667eea; margin-bottom: 20px; }
+        .info { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; color: #333; min-height: 30px; }
+        .board { display: grid; grid-template-columns: repeat(3, 110px); gap: 8px; margin: 30px auto; }
+        .cell { width: 110px; height: 110px; background: linear-gradient(135deg, #f0f4ff, #e0e7ff); border: 3px solid #667eea; border-radius: 10px; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        .cell:hover { background: linear-gradient(135deg, #e0e7ff, #d0d7ff); transform: scale(1.05); }
+        .cell.x { color: #ef4444; }
+        .cell.o { color: #3b82f6; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 30px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 10px; font-weight: bold; transition: opacity 0.3s; }
+        button:hover { opacity: 0.8; }
+        .back { margin-top: 30px; }
+        .back a { color: #667eea; text-decoration: none; font-weight: bold; }
+        .back a:hover { text-decoration: underline; }
+    </style>
+</head>
     <title>Tic Tac Toe - Sakaz PlayZone</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
