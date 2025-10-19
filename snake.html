@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game - Play Free Online | Sakaz PlayZone</title>
+    <meta name="description" content="Play free Snake game online. Eat food and grow longer while avoiding walls and yourself. Classic arcade game at Sakaz PlayZone.">
+    <meta name="keywords" content="snake game, free online game, arcade game, classic game, snake online">
+    <meta property="og:title" content="Snake - Free Online Game">
+    <meta property="og:description" content="Play Snake online and try to become the longest snake!">
+    <link rel="canonical" href="https://saka0701.github.io/Sakaz-gaming-/snake.html">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        h1 { color: #667eea; margin-bottom: 20px; }
+        canvas { border: 3px solid #667eea; border-radius: 10px; background: #000; display: block; margin: 20px auto; }
+        .controls { margin: 20px 0; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 30px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 10px; font-weight: bold; transition: opacity 0.3s; }
+        button:hover { opacity: 0.8; }
+        .score-display { font-size: 1.3rem; font-weight: bold; color: #333; margin: 10px 0; }
+        .instructions { background: #f0f4ff; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: left; color: #333; }
+        .instructions h3 { color: #667eea; margin-bottom: 10px; }
+        .back { margin-top: 20px; }
+        .back a { color: #667eea; text-decoration: none; font-weight: bold; }
+        .back a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐍 Snake Game</h1>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="score-display">
+            Score: <span id="score">0</span> | High: <span id="high">0</span>
+        </div>
+        <div class="controls">
+            <button onclick="startGame()">🎮 Start Game</button>
+            <button onclick="resetHigh()">🔄 Reset High Score</button>
+        </div>
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <p>✓ Use Arrow Keys or WASD to move the snake</p>
+            <p>✓ Eat red food to grow and gain points</p>
+            <p>✓ Avoid hitting walls and yourself</p>
+            <p>✓ The longer you survive, the faster you go!</p>
+        </div>
+        <div class="back">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let snake = [{x: 10, y: 10}];
+        let food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+        let direction = {x: 1, y: 0};
+        let nextDirection = {x: 1, y: 0};
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('snakeHigh')) || 0;
+        let gameRunning = false;
+        let gameSpeed = 8;
+        
+        document.getElementById('high').textContent = highScore;
+        
+        function startGame() {
+            snake = [{x: 10, y: 10}];
+            direction = {x: 1, y: 0};
+            nextDirection = {x: 1, y: 0};
+            score = 0;
+            gameSpeed = 8;
+            gameRunning = true;
+            document.getElementById('score').textContent = 0;
+            gameLoop();
+        }
+        
+        function gameLoop() {
+            if(!gameRunning) return;
+            setTimeout(() => {
+                update();
+                draw();
+                gameLoop();
+            }, 1000 / gameSpeed);
+        }
+        
+        function update() {
+            direction = nextDirection;
+            const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+            
+            if(head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) {
+                endGame();
+                return;
+            }
+            
+            for(let segment of snake) {
+                if(head.x === segment.x && head.y === segment.y) {
+                    endGame();
+                    return;
+                }
+            }
+            
+            snake.unshift(head);
+            
+            if(head.x === food.x && head.y === food.y) {
+                score += 10;
+                gameSpeed += 0.5;
+                document.getElementById('score').textContent = score;
+                food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+            } else {
+                snake.pop();
+            }
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00FF00';
+            snake.forEach((segment, i) => {
+                ctx.fillRect(segment.x * 20, segment.y * 20, 18, 18);
+                if(i === 0) {
+                    ctx.fillStyle = '#00AA00';
+                    ctx.fillRect(segment.x * 20 + 2, segment.y * 20 + 2, 14, 14);
+                    ctx.fillStyle = '#00FF00';
+                }
+            });
+            
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(food.x * 20, food.y * 20, 20, 20);
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            if(score > highScore) {
+                highScore = score;
+                localStorage.setItem('snakeHigh', highScore);
+                document.getElementById('high').textContent = highScore;
+            }
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.font = '40px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Game Over!', 200, 180);
+            ctx.font = '30px Arial';
+            ctx.fillText('Score: ' + score, 200, 230);
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if(!gameRunning) return;
+            switch(e.key.toLowerCase()) {
+                case 'arrowup':
+                case 'w':
+                    if(direction.y === 0) nextDirection = {x: 0, y: -1};
+                    break;
+                case 'arrowdown':
+                case 's':
+                    if(direction.y === 0) nextDirection = {x: 0, y: 1};
+                    break;
+                case 'arrowleft':
+                case 'a':
+                    if(direction.x === 0) nextDirection = {x: -1, y: 0};
+                    break;
+                case 'arrowright':
+                case 'd':
+                    if(direction.x === 0) nextDirection = {x: 1, y: 0};
+                    break;
+            }
+        });
+        
+        function resetHigh() {
+            highScore = 0;
+            localStorage.removeItem('snakeHigh');
+            document.getElementById('high').textContent = 0;
+        }
+    </script>
+</body>
+  </html>
