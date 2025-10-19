@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flip a Coin - Sakaz PlayZone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        h1 { color: #667eea; margin-bottom: 30px; }
+        .coin { width: 180px; height: 180px; margin: 40px auto; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 6rem; border: 8px solid #d97706; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .coin.flip { animation: spin 0.8s ease-in-out; }
+        @keyframes spin { 0% { transform: rotateY(0deg) rotateX(0deg); } 100% { transform: rotateY(1800deg) rotateX(360deg); } }
+        .result { font-size: 2rem; font-weight: bold; margin: 20px 0; min-height: 40px; color: #667eea; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 30px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 10px; font-weight: bold; transition: opacity 0.3s; }
+        button:hover { opacity: 0.8; }
+        .stats { display: flex; justify-content: space-around; margin: 30px 0; gap: 10px; }
+        .stat { padding: 15px; background: linear-gradient(135deg, #f0f4ff, #e0e7ff); border-radius: 10px; flex: 1; }
+        .stat-label { font-size: 0.9rem; color: #666; }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #667eea; }
+        .back { margin-top: 30px; }
+        .back a { color: #667eea; text-decoration: none; font-weight: bold; }
+        .back a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪙 Flip a Coin</h1>
+        <div class="coin" id="coin">🪙</div>
+        <div class="result" id="result">Click "Flip Coin" to start!</div>
+        <button onclick="flip()">🎲 Flip Coin</button>
+        <button onclick="resetStats()">🔄 Reset Stats</button>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Heads</div>
+                <div class="stat-number" id="heads">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Tails</div>
+                <div class="stat-number" id="tails">0</div>
+            </div>
+        </div>
+        <div class="back">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+    <script>
+        let heads = 0;
+        let tails = 0;
+        
+        function flip() {
+            const coin = document.getElementById('coin');
+            const result = document.getElementById('result');
+            
+            coin.classList.remove('flip');
+            result.textContent = 'Flipping...';
+            result.style.color = '#999';
+            
+            setTimeout(() => {
+                coin.classList.add('flip');
+                const isHeads = Math.random() < 0.5;
+                
+                setTimeout(() => {
+                    if(isHeads) {
+                        coin.textContent = '👑';
+                        result.textContent = 'HEADS! 👑';
+                        result.style.color = '#fbbf24';
+                        heads++;
+                        document.getElementById('heads').textContent = heads;
+                    } else {
+                        coin.textContent = '🎯';
+                        result.textContent = 'TAILS! 🎯';
+                        result.style.color = '#f59e0b';
+                        tails++;
+                        document.getElementById('tails').textContent = tails;
+                    }
+                }, 800);
+            }, 100);
+        }
+        
+        function resetStats() {
+            heads = 0;
+            tails = 0;
+            document.getElementById('heads').textContent = 0;
+            document.getElementById('tails').textContent = 0;
+            document.getElementById('result').textContent = 'Stats reset!';
+            document.getElementById('result').style.color = '#667eea';
+            document.getElementById('coin').textContent = '🪙';
+        }
+    </script>
+</body>
+</html>
